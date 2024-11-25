@@ -1,0 +1,16 @@
+// Add this to your existing schema.prisma file
+
+model GridSnapshot {
+  id         String   @id @default(cuid())
+  keywordId  String
+  date       DateTime
+  rank       Int
+  avgAGR     Float
+  ATGR       Float
+  SoLV       Float
+  gridPoints String   // JSON string of grid points
+  keyword    Keyword  @relation(fields: [keywordId], references: [id])
+
+  @@index([keywordId, date])
+  @@map("grid_snapshots")
+}

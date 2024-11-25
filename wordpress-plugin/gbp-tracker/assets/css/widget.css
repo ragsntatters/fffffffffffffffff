@@ -1,0 +1,57 @@
+.gbp-tracker-widget {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.gbp-tracker-widget.theme-dark {
+    background-color: #1a202c;
+    color: #fff;
+}
+
+.gbp-tracker-widget.theme-light {
+    background-color: #fff;
+    color: #1a202c;
+}
+
+.gbp-tracker-widget input,
+.gbp-tracker-widget select,
+.gbp-tracker-widget button {
+    width: 100%;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.gbp-tracker-widget button {
+    background-color: #4299e1;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.gbp-tracker-widget button:hover {
+    background-color: #3182ce;
+}
+
+.gbp-tracker-widget .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+}
+
+.gbp-tracker-widget .error {
+    color: #e53e3e;
+    padding: 10px;
+    border: 1px solid #feb2b2;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    background-color: #fff5f5;
+}

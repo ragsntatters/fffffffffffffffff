@@ -1,0 +1,30 @@
+.wrap {
+    max-width: 800px;
+}
+
+.gbp-tracker-shortcode-info {
+    margin-top: 30px;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+}
+
+.gbp-tracker-shortcode-info code {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #f0f0f1;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+.form-table td input[type="text"] {
+    width: 100%;
+    max-width: 400px;
+}
+
+.description {
+    color: #646970;
+    font-style: italic;
+    margin-top: 4px;
+}

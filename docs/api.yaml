@@ -1,0 +1,411 @@
+openapi: 3.0.0
+info:
+  title: GBP Tracker API
+  version: 1.0.0
+  description: API documentation for the GBP Tracker application
+
+servers:
+  - url: http://localhost:3001/api
+    description: Development server
+  - url: https://api.gbptracker.com
+    description: Production server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          type: string
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        totalPages:
+          type: integer
+
+    ApiResponse:
+      type: object
+      properties:
+        data:
+          type: object
+        meta:
+          type: object
+          properties:
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+        error:
+          $ref: '#/components/schemas/Error'
+
+    LoginInput:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+
+    RegisterInput:
+      type: object
+      required:
+        - email
+        - password
+        - firstName
+        - lastName
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        firstName:
+          type: string
+        lastName:
+          type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        role:
+          type: string
+          enum: [admin, editor, viewer]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Location:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        placeId:
+          type: string
+        address:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        phone:
+          type: string
+        website:
+          type: string
+        timezone:
+          type: string
+        primaryCategory:
+          type: string
+        categories:
+          type: array
+          items:
+            type: string
+        settings:
+          type: object
+          properties:
+            notifyOnReviews:
+              type: boolean
+            notifyOnRankChanges:
+              type: boolean
+            autoApproveResponses:
+              type: boolean
+            reviewAlertThreshold:
+              type: number
+            rankingAlertThreshold:
+              type: number
+
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+        locationId:
+          type: string
+        googleReviewId:
+          type: string
+        author:
+          type: string
+        rating:
+          type: number
+        text:
+          type: string
+        status:
+          type: string
+          enum: [active, flagged, resolved]
+        response:
+          type: object
+          properties:
+            text:
+              type: string
+            status:
+              type: string
+              enum: [pending, approved, rejected, published]
+            publishedAt:
+              type: string
+              format: date-time
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+        locationId:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        status:
+          type: string
+          enum: [draft, pending, scheduled, published, rejected]
+        platforms:
+          type: array
+          items:
+            type: string
+            enum: [google, facebook, instagram]
+        schedule:
+          type: string
+          format: date-time
+        publishedAt:
+          type: string
+          format: date-time
+
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        plan:
+          type: string
+          enum: [free, starter, professional, enterprise]
+        status:
+          type: string
+          enum: [active, past_due, canceled, trialing]
+        currentPeriodStart:
+          type: string
+          format: date-time
+        currentPeriodEnd:
+          type: string
+          format: date-time
+        cancelAtPeriodEnd:
+          type: boolean
+        quantity:
+          type: integer
+
+    Invoice:
+      type: object
+      properties:
+        id:
+          type: string
+        subscriptionId:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        status:
+          type: string
+          enum: [draft, open, paid, void, uncollectible]
+        dueDate:
+          type: string
+          format: date-time
+        paidAt:
+          type: string
+          format: date-time
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              description:
+                type: string
+              amount:
+                type: number
+              quantity:
+                type: integer
+
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterInput'
+      responses:
+        201:
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /auth/login:
+    post:
+      summary: Login user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginInput'
+      responses:
+        200:
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /locations:
+    get:
+      summary: Get all locations
+      tags: [Locations]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        200:
+          description: List of locations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /reviews/locations/{locationId}:
+    get:
+      summary: Get location reviews
+      tags: [Reviews]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: locationId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        200:
+          description: List of reviews
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /posts/locations/{locationId}:
+    get:
+      summary: Get location posts
+      tags: [Posts]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: locationId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        200:
+          description: List of posts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /billing/subscription:
+    get:
+      summary: Get current subscription
+      tags: [Billing]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Subscription details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /billing/invoices:
+    get:
+      summary: Get billing invoices
+      tags: [Billing]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        200:
+          description: List of invoices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
